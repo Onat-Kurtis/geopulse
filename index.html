@@ -13,13 +13,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Segoe UI', 'Roboto', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                        }
                     }
                 }
             }
@@ -60,15 +53,15 @@
         }
     </style>
 </head>
-<body class="bg-[#0b0f17] text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-brand-500/30">
+<body class="bg-[#0b0f17] text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-zinc-700">
 
     <!-- Ekstrem Uyarı Şeridi -->
-    <div id="alert-banner" class="hidden bg-amber-500/10 border-b border-amber-500/20 text-amber-200 px-6 py-2.5 text-xs font-medium flex items-center justify-between backdrop-blur-md z-[600]">
+    <div id="alert-banner" class="hidden bg-zinc-900 border-b border-zinc-800 text-zinc-300 px-6 py-2.5 text-xs font-medium flex items-center justify-between backdrop-blur-md z-[600]">
         <div class="flex items-center gap-2">
-            <i data-lucide="triangle-alert" class="w-4 h-4 text-amber-400"></i>
+            <i data-lucide="triangle-alert" class="w-4 h-4 text-zinc-400"></i>
             <span id="alert-message">Meteorolojik Durum Uyarı Modülü</span>
         </div>
-        <button onclick="document.getElementById('alert-banner').classList.add('hidden')" class="text-amber-400/60 hover:text-amber-400">
+        <button onclick="document.getElementById('alert-banner').classList.add('hidden')" class="text-zinc-500 hover:text-zinc-300">
             <i data-lucide="x" class="w-4 h-4"></i>
         </button>
     </div>
@@ -76,12 +69,12 @@
     <!-- Üst Header Barı -->
     <header class="border-b border-white/5 px-6 py-3.5 flex flex-wrap justify-between items-center gap-4 bg-[#0b0f17]/80 backdrop-blur-md sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-200">
+            <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300">
                 <i data-lucide="wind" class="w-4 h-4"></i>
             </div>
             <div>
                 <h1 class="font-semibold text-sm tracking-tight text-white">GeoPulse</h1>
-                <p class="text-[11px] text-zinc-400">Atmosferik Analiz ve Karar Destek Platformu</p>
+                <p class="text-[11px] text-zinc-500">Atmosferik Analiz ve Karar Destek Platformu</p>
             </div>
         </div>
 
@@ -135,7 +128,7 @@
                             <h2 id="location-name-1" class="text-sm font-semibold text-white">Konum Yükleniyor...</h2>
                             <p id="location-coords-1" class="text-[11px] text-zinc-500 font-mono mt-0.5">--° N, --° E</p>
                         </div>
-                        <div id="weather-icon-container" class="text-zinc-300">
+                        <div id="weather-icon-container" class="text-zinc-400">
                             <i data-lucide="sun" class="w-6 h-6"></i>
                         </div>
                     </div>
@@ -168,13 +161,13 @@
                 </div>
 
                 <div class="glass-panel rounded-2xl p-4 flex flex-col gap-2">
-                    <span class="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">Veri Çıktısı</span>
+                    <span class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider">Veri Çıktısı</span>
                     <div class="grid grid-cols-2 gap-2 mt-1">
                         <button onclick="exportCSV()" class="glass-button text-xs text-zinc-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
-                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-zinc-400"></i> CSV
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-zinc-500"></i> CSV
                         </button>
                         <button onclick="exportGeoJSON()" class="glass-button text-xs text-zinc-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
-                            <i data-lucide="file-json" class="w-3.5 h-3.5 text-zinc-400"></i> GeoJSON
+                            <i data-lucide="file-json" class="w-3.5 h-3.5 text-zinc-500"></i> GeoJSON
                         </button>
                     </div>
                 </div>
@@ -186,7 +179,7 @@
             <div class="flex justify-between items-center pb-4 border-b border-white/5">
                 <div>
                     <h2 class="text-sm font-semibold text-white">48 Saatlik Atmosfer Projeksiyonu</h2>
-                    <p class="text-xs text-zinc-400 mt-0.5">Mevcut saatten itibaren önümüzdeki 48 saatin sıcaklık ve yağış eğrisi.</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">Mevcut saatten itibaren önümüzdeki 48 saatin sıcaklık ve yağış eğrisi.</p>
                 </div>
                 <div class="text-right">
                     <p id="location-name-2" class="text-xs font-semibold text-zinc-300">--</p>
@@ -206,7 +199,7 @@
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
                 <div>
                     <h2 class="text-sm font-semibold text-white">7 Günlük Meteorolojik Görünüm</h2>
-                    <p class="text-xs text-zinc-400 mt-0.5">Haftalık termal salınım ve toplam yağış beklentisi.</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">Haftalık termal salınım ve toplam yağış beklentisi.</p>
                 </div>
                 <div class="text-right">
                     <p id="location-name-3" class="text-xs font-semibold text-zinc-300">--</p>
@@ -216,14 +209,14 @@
             <div id="forecast-container" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 my-auto"></div>
         </div>
 
-        <!-- 4. SEKME: DİNAMİK SAAT SEÇİCİLİ SPOR PLANLAYICI -->
+        <!-- 4. SEKME: SPOR & PLANLAYICI (Ağırbaşlı, Tam Bilgi İçeren Teknik Tasarım) -->
         <div id="sports-tab" class="tab-content hidden h-full flex-1 flex flex-col glass-panel rounded-2xl p-6 gap-6">
             <div class="flex flex-wrap justify-between items-center pb-4 border-b border-white/5 gap-4">
                 <div>
                     <h2 class="text-sm font-semibold text-white flex items-center gap-2">
-                        <i data-lucide="trophy" class="w-4 h-4 text-brand-500"></i> Gelecek 48 Saatlik Spor & Etkinlik Planlayıcı
+                        <i data-lucide="trophy" class="w-4 h-4 text-zinc-400"></i> Spor ve Aktivite Planlayıcı
                     </h2>
-                    <p class="text-xs text-zinc-400 mt-0.5">Mevcut saatten itibaren dilediğin saati seç, o anki hava koşullarına göre spor skorunu gör.</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">Zaman çizelgesini kaydırarak anlık meteorolojik koşullara göre branş analizini inceleyin.</p>
                 </div>
                 <div class="text-right">
                     <p id="location-name-5" class="text-xs font-semibold text-zinc-300">--</p>
@@ -232,33 +225,34 @@
             </div>
 
             <!-- SAAT SEÇİCİ SLIDER -->
-            <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="bg-black/20 border border-white/5 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="w-full md:w-2/3 flex flex-col gap-2">
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-zinc-400 font-medium">Hedef Zaman Seçin:</span>
-                        <span id="selected-time-label" class="text-brand-500 font-bold font-mono">Şimdi (Canlı)</span>
+                        <span class="text-zinc-400 font-mono">Hedef Zaman:</span>
+                        <span id="selected-time-label" class="text-zinc-200 font-bold font-mono">Şimdi (Canlı)</span>
                     </div>
-                    <input id="sports-time-slider" type="range" min="0" max="47" value="0" oninput="onSportsSliderChange(this.value)" class="w-full accent-brand-500 bg-zinc-800 rounded-lg cursor-pointer h-2">
+                    <input id="sports-time-slider" type="range" min="0" max="47" value="0" oninput="onSportsSliderChange(this.value)" class="w-full accent-zinc-500 bg-zinc-800 rounded-lg cursor-pointer h-1.5">
                     <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
-                        <span>Şimdi</span>
-                        <span>+24 Saat Sonra</span>
-                        <span>+48 Saat Sonra</span>
+                        <span>T0 (Şimdi)</span>
+                        <span>+24 Saat</span>
+                        <span>+48 Saat</span>
                     </div>
                 </div>
 
-                <div class="w-full md:w-1/3 bg-white/5 rounded-lg p-3 border border-white/5 flex items-center justify-between">
+                <div class="w-full md:w-1/3 bg-white/[0.02] rounded-lg p-3 border border-white/5 flex items-center justify-between font-mono text-xs">
                     <div>
-                        <span class="text-[10px] text-zinc-400 block">Seçilen Saatte Hava</span>
-                        <span id="target-temp-text" class="text-sm font-semibold text-white">--°C</span>
+                        <span class="text-[10px] text-zinc-500 block">Sıcaklık / Durum</span>
+                        <span id="target-temp-text" class="font-semibold text-white">--°C</span>
                         <span id="target-condition-text" class="text-[11px] text-zinc-400 block">--</span>
                     </div>
-                    <div class="text-right text-[11px] text-zinc-400 font-mono">
-                        <div>Rüzgâr: <span id="target-wind-text" class="text-zinc-200">-- km/s</span></div>
-                        <div>Yağış İht.: <span id="target-pop-text" class="text-zinc-200">% --</span></div>
+                    <div class="text-right">
+                        <div>Rüzgâr: <span id="target-wind-text" class="text-zinc-300">-- km/s</span></div>
+                        <div>Yağış: <span id="target-pop-text" class="text-zinc-300">% --</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Spor Kartları Listesi (Tam Bilgi, Mat ve Ağırbaşlı Tonlar) -->
             <div id="sports-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1"></div>
         </div>
 
@@ -267,7 +261,7 @@
             <div class="flex justify-between items-center pb-4 border-b border-white/5">
                 <div>
                     <h2 class="text-sm font-semibold text-white">Sektörel Karar Destek Raporu</h2>
-                    <p class="text-xs text-zinc-400 mt-0.5">Anlık ve tahmini telemetri parametreleriyle oluşturulan teknik etki matrisi.</p>
+                    <p class="text-xs text-zinc-500 mt-0.5">Anlık ve tahmini telemetri parametreleriyle oluşturulan teknik etki matrisi.</p>
                 </div>
                 <div class="text-right">
                     <p id="location-name-4" class="text-xs font-semibold text-zinc-300">--</p>
@@ -279,7 +273,7 @@
                 <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
-                            <i data-lucide="sprout" class="w-4 h-4 text-emerald-400"></i> Hassas Tarım & Sulama Optimizasyonu
+                            <i data-lucide="sprout" class="w-4 h-4 text-zinc-400"></i> Hassas Tarım & Sulama Optimizasyonu
                         </div>
                         <p id="ai-agriculture" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
                     </div>
@@ -287,7 +281,7 @@
                 <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
-                            <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i> Orman Yangını & Risk Endeksi
+                            <i data-lucide="flame" class="w-4 h-4 text-zinc-400"></i> Orman Yangını & Risk Endeksi
                         </div>
                         <p id="ai-fire" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
                     </div>
@@ -295,7 +289,7 @@
                 <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
-                            <i data-lucide="waves" class="w-4 h-4 text-cyan-400"></i> Denizcilik & Kürek (Rowing) Güvenliği
+                            <i data-lucide="waves" class="w-4 h-4 text-zinc-400"></i> Denizcilik & Kürek (Rowing) Güvenliği
                         </div>
                         <p id="ai-maritime" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
                     </div>
@@ -303,7 +297,7 @@
                 <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
-                            <i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i> Dış Mekan Antrenman & Fizyoloji
+                            <i data-lucide="activity" class="w-4 h-4 text-zinc-400"></i> Dış Mekan Antrenman & Fizyoloji
                         </div>
                         <p id="ai-sports" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
                     </div>
@@ -530,7 +524,7 @@
                 card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-3 min-w-[95px] text-center flex flex-col items-center justify-between";
                 card.innerHTML = `
                     <span class="text-[10px] text-zinc-500 font-mono">${h}</span>
-                    <div class="my-2 text-zinc-300"><i data-lucide="${info.icon}" class="w-4 h-4"></i></div>
+                    <div class="my-2 text-zinc-400"><i data-lucide="${info.icon}" class="w-4 h-4"></i></div>
                     <span class="text-xs font-medium text-white">${Math.round(slicedTemps[i])}°C</span>
                     <span class="text-[9px] text-zinc-500 mt-0.5">${slicedPrecips[i]} mm</span>
                 `;
@@ -544,8 +538,8 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Sıcaklık (°C)', data: slicedTemps, borderColor: 'rgba(255, 255, 255, 0.8)', borderWidth: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.02)', fill: true, tension: 0.4, pointRadius: 0 },
-                        { label: 'Yağış (mm)', data: slicedPrecips, borderColor: 'rgba(56, 189, 248, 0.8)', borderWidth: 1.5, backgroundColor: 'rgba(56, 189, 248, 0.05)', fill: true, tension: 0.2, pointRadius: 0 }
+                        { label: 'Sıcaklık (°C)', data: slicedTemps, borderColor: 'rgba(255, 255, 255, 0.7)', borderWidth: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.02)', fill: true, tension: 0.4, pointRadius: 0 },
+                        { label: 'Yağış (mm)', data: slicedPrecips, borderColor: 'rgba(161, 161, 170, 0.7)', borderWidth: 1.5, backgroundColor: 'rgba(161, 161, 170, 0.05)', fill: true, tension: 0.2, pointRadius: 0 }
                     ]
                 },
                 options: {
@@ -600,59 +594,53 @@
                     category: "Dış Mekan",
                     getDetails: () => {
                         if (isRaining) return {
-                            status: "Riskli / Kaygan Zemin",
-                            ideal: "Yağışsız zemin, 10°C - 20°C arası sıcaklık",
-                            problem: "Yağış olasılığı ve ıslak asfalt tutuş kaybına, eklem ve kaslara binen stresi artırmaya yol açabilir.",
-                            suggestion: "Koşuyu erteleyin veya kapalı alanda koşu bandı tercih edin. Dışarıda koşacaksanız tabanı güçlü ayakkabılar giyin."
+                            status: "Uygun Değil",
+                            ideal: "Kuru zemin, 10°C - 20°C",
+                            problem: "Yağış ve ıslak zemin tutuş kaybına neden olur.",
+                            suggestion: "Kapalı alana yönelin veya koşuyu erteleyin."
                         };
                         if (temp >= 10 && temp <= 20 && wind < 25) return {
-                            status: "Kusursuz Koşul",
-                            ideal: "10°C - 20°C arası sıcaklık, düşük rüzgâr",
-                            problem: "Hiçbir termal veya meteorolojik risk bulunmuyor.",
-                            suggestion: "Kardiyovasküler kapasiteyi zorlamak için ideal zaman. Standart dinamik ısınma ile hemen başlayabilirsiniz."
+                            status: "Uygun",
+                            ideal: "10°C - 20°C, düşük rüzgâr",
+                            problem: "Majör bir kısıt bulunmuyor.",
+                            suggestion: "Standart antrenman için elverişli."
                         };
                         if (temp > 25) return {
-                            status: "Yüksek Sıcaklık Stresi",
-                            ideal: "10°C - 20°C arası serin hava",
-                            problem: `Sıcaklık ${Math.round(temp)}°C seviyesinde. Erken yorulma, yüksek nabız ve dehidrasyon riski yüksek.`,
-                            suggestion: "Antrenmanı güneşin dik olmadığı sabah erken veya akşam saatlerine kaydırın, elektrolit takviyesini unutmayın."
+                            status: "Sıcaklık Stresi",
+                            ideal: "10°C - 20°C",
+                            problem: "Yüksek sıcaklık erken yorulma yapar.",
+                            suggestion: "Erken saatleri tercih edin, sıvı tüketin."
                         };
                         return {
-                            status: "Düşük Sıcaklık / Soğuk",
-                            ideal: "10°C ve üzeri sıcaklık",
-                            problem: `Sıcaklık ${Math.round(temp)}°C. Yeterli ısınma yapılmazsa kas lifi zorlanması ve kramp riski yaşanabilir.`,
-                            suggestion: "Statik esneme yerine en az 10-15 dakika tempolu dinamik ısınma (açma-germe hareketleri) yapın ve rüzgarlık giyin."
+                            status: "Düşük Sıcaklık",
+                            ideal: "10°C ve üzeri",
+                            problem: "Soğuk hava kas esnekliğini düşürür.",
+                            suggestion: "Ekstra ısınma periyodu uygulayın."
                         };
                     }
                 },
                 {
                     name: "Tenis",
                     icon: "activity",
-                    category: "Açık Saha / Kort",
+                    category: "Açık Saha",
                     getDetails: () => {
                         if (isRaining) return {
-                            status: "Kort Kullanılamaz",
-                            ideal: "Kuru zemin, 15°C - 28°C arası hava",
-                            problem: "Yağış ve ıslak zemin kortta kaymaya, düşmeye ve ciddi sakatlıklara yol açabilir.",
-                            suggestion: "Açık kort maçını erteleyin veya kapalı/sentetik kort tercih edin."
+                            status: "Uygun Değil",
+                            ideal: "Kuru kort zemini",
+                            problem: "Islak zemin kortta kaymaya yol açar.",
+                            suggestion: "Kapalı kort tercih edin."
                         };
                         if (wind > 20) return {
-                            status: "Zorlu Rüzgar",
-                            ideal: "20 km/s altı rüzgar hızı",
-                            problem: `Rüzgar hızı ${wind} km/s. Havalanan topların falsosu ve yönü ciddi şekilde sapar.`,
-                            suggestion: "Taktik olarak kısa toplardan kaçının, rüzgarı hesaba katarak vuruş yapın."
-                        };
-                        if (temp < 10 || temp > 32) return {
-                            status: "Termal Zorlanma",
-                            ideal: "15°C - 28°C sıcaklık aralığı",
-                            problem: `Sıcaklık ${Math.round(temp)}°C. Kas esnekliği veya çabuk yorulma açısından optimal değil.`,
-                            suggestion: "Ekstra ısınma seti uygulayın ve bol sıvı tüketin."
+                            status: "Rüzgârlı",
+                            ideal: "20 km/s altı rüzgâr",
+                            problem: `Rüzgâr hızı (${wind} km/s) topun uçuşunu etkiler.`,
+                            suggestion: "Kısa vuruşlardan kaçının."
                         };
                         return {
-                            status: "İdeal Kort Şartları",
-                            ideal: "15°C - 28°C, rüzgarsız ve kuru",
-                            problem: "Kort performansı için engelleyici bir faktör bulunmuyor.",
-                            suggestion: "Zeminin ve havanın tadını çıkararak maçını planlayabilirsin."
+                            status: "Uygun",
+                            ideal: "15°C - 28°C, kuru",
+                            problem: "Olumsuz faktör yok.",
+                            suggestion: "Maç planlaması yapılabilir."
                         };
                     }
                 },
@@ -662,22 +650,16 @@
                     category: "Su Sporu",
                     getDetails: () => {
                         if (wind > 20 || isRaining) return {
-                            status: "Güvensiz Su Koşulları",
-                            ideal: "Rüzgâr 10 km/s altı, durgun su",
-                            problem: `Rüzgâr şiddetli (${wind} km/s) ve dalga boyu yüksek. Tekne dengesini korumak zorlaşır ve güvenlik riski doğar.`,
-                            suggestion: "Açık su faaliyetini iptal edin. Salonda ergometre (kürek simülatörü) ile teknik ve watt antrenmanına odaklanın."
-                        };
-                        if (wind <= 10 && !isRaining) return {
-                            status: "Optimum Su Yüzeyi",
-                            ideal: "10 km/s altı rüzgâr",
-                            problem: "Hiçinci bir dalga veya akıntı baskısı yok.",
-                            suggestion: "Su pürüzsüz; yakar top, çekiş uzunluğu ve kürek tutuş tekniklerini geliştirmek için kusursuz bir fırsat."
+                            status: "Riskli",
+                            ideal: "Sakin su yüzeyi",
+                            problem: `Yüksek rüzgâr (${wind} km/s) ve dalga güvenliği tehlikeye atar.`,
+                            suggestion: "Su faaliyetini iptal edin, ergometreye geçin."
                         };
                         return {
-                            status: "Esintili / Sınırda",
-                            ideal: "Sakin körfez suları",
-                            problem: `Rüzgâr ${wind} km/s esiyor. Dalgalanma teknede su sıçratabilir ve rotada sapma yapabilir.`,
-                            suggestion: "Açık deniz yerine korunaklı kıyı parkurlarını seçin, kürek sırtı rüzgâra karşı dikkatli olun."
+                            status: "Uygun",
+                            ideal: "10 km/s altı rüzgâr",
+                            problem: "Akıntı baskısı düşük.",
+                            suggestion: "Teknik ve çekiş antrenmanı için uygun."
                         };
                     }
                 },
@@ -687,67 +669,48 @@
                     category: "Dış Mekan",
                     getDetails: () => {
                         if (wind > 25 || isRaining) return {
-                            status: "Yol Tutuş Riski",
-                            ideal: "Kuru zemin, hafif rüzgâr",
-                            problem: isRaining ? "Islak asfalt fren mesafesini uzatır ve virajlarda kayma riski doğurur." : `Şiddetli yan rüzgâr (${wind} km/s) gidon hâkimiyetini sarsar.`,
-                            suggestion: "Sürüşü erteleyin. Dışarı çıkmak zorundaysanız lastik basınçlarını bir miktar düşürerek zemin tutuşunu artırın."
+                            status: "Riskli",
+                            ideal: "Kuru asfalt",
+                            problem: "Fren mesafesi uzar veya yan rüzgâr dengesizlik yaratır.",
+                            suggestion: "Sürüşü erteleyin."
                         };
                         return {
-                            status: "Sürüş İçin Uygun",
-                            ideal: "12°C - 24°C arası sıcaklık",
-                            problem: "Normal trafik ve rüzgâr dinamikleri dışında majör bir risk yok.",
-                            suggestion: "Rüzgâr kesen rüzgârlık giyin, uzun sürüşler için rüzgâr tüneli pozisyonuna ve sıvı tüketimine dikkat edin."
+                            status: "Uygun",
+                            ideal: "12°C - 24°C",
+                            problem: "Normal trafik dışında risk yok.",
+                            suggestion: "Rüzgarlık giyin ve hidrasyona dikkat edin."
                         };
                     }
                 },
                 {
-                    name: "Kalistenik & Park Antrenmanı",
+                    name: "Kalistenik & Park",
                     icon: "dumbell",
                     category: "Dış Mekan",
                     getDetails: () => {
                         if (isRaining) return {
-                            status: "Ekipman Kayganlığı",
-                            ideal: "Kuru demir bar ve barlar",
-                            problem: "Yağış nedeniyle parktaki barfiks ve paralel bar demirleri ıslak olacak; el kavrama (grip) gücü düşer ve düşme riski artar.",
-                            suggestion: "Eğer imkan varsa kapalı bara geçin veya magnezyum tozu/özel eldiven kullanın; antrenmanı core ve yer hareketlerine kaydırın."
+                            status: "Kaygan Ekipman",
+                            ideal: "Kuru barlar",
+                            problem: "Demir barlar ıslak olduğu için tutuş düşer.",
+                            suggestion: "Eldiven kullanın veya yere yakın hareketlere odaklanın."
                         };
                         return {
-                            status: "Park Antrenmanı İçin Uygun",
-                            ideal: "15°C - 25°C kuru hava",
-                            problem: "Hava serinse eklem sıvıları henüz tam akışkanlaşmamış olabilir.",
-                            suggestion: "Antrenmana başlamadan önce omuz ve bilek eklemlerini dairesel hareketlerle iyice ısıtın, ani patlayıcı hareketlerden kaçının."
+                            status: "Uygun",
+                            ideal: "Kuru park alanı",
+                            problem: "Soğuk havada eklem sertliği olabilir.",
+                            suggestion: "Omuz ve bilekleri iyi ısıtın."
                         };
                     }
                 },
                 {
-                    name: "Açık Deniz Yüzme",
-                    icon: "waves",
-                    category: "Su Sporu",
-                    getDetails: () => {
-                        if (temp < 18 || wind > 25 || isRaining) return {
-                            status: "Hipotermi / Akıntı Riski",
-                            ideal: "Su sıcaklığı >22°C, sakin deniz",
-                            problem: `Su sıcaklığı düşük (${temp}°C) veya rüzgâr fazla (${wind} km/s). Vücut ısısının hızla düşmesine (hipotermi) yol açabilir.`,
-                            suggestion: "Kesinlikle neopren yüzücü kıyafeti (wetsuit) olmadan girmeyin veya antrenmanı havuzda sonlandırın."
-                        };
-                        return {
-                            status: "Yüzülebilir Şartlar",
-                            ideal: "Dengeli su ve hava sıcaklığı",
-                            problem: "Olağandışı bir akıntı uyarısı bulunmuyor.",
-                            suggestion: "Suya yavaş yavaş girerek termal şokü atlatın, kıyıya paralel yüzme rotasını tercih edin."
-                        };
-                    }
-                },
-                {
-                    name: "Kapalı Salon / Ergometre (Erg)",
+                    name: "Kapalı Salon / Ergometre",
                     icon: "building",
                     category: "İç Mekan",
                     getDetails: () => {
                         return {
-                            status: "Güvenli Alternatif",
-                            ideal: "İklimlendirilmiş salon ortamı",
-                            problem: "Dış ortam şartlarından tamamen bağımsızdır.",
-                            suggestion: "Dışarıdaki olumsuz hava koşullarından (fırtına, yağmur, aşırı sıcak) etkilenmemek için bu saati ergometre veya salon antrenmanına ayırabilirsiniz."
+                            status: "Alternatif",
+                            ideal: "İklimlendirilmiş ortam",
+                            problem: "Dış hava koşullarından bağımsız.",
+                            suggestion: "Dışarıdaki olumsuz şartlarda güvenle tercih edilebilir."
                         };
                     }
                 }
@@ -756,45 +719,32 @@
             const container = document.getElementById('sports-list-container');
             container.innerHTML = '';
 
-            sports.sort((a, b) => {
-                const detA = a.getDetails();
-                const detB = b.getDetails();
-                if (detA.status.includes("Kusursuz") || detA.status.includes("Uygun") || detA.status.includes("İdeal") || detA.status.includes("Alternatif")) return -1;
-                return 1;
-            });
-
             sports.forEach(s => {
                 const info = s.getDetails();
-                let badgeColor = "text-emerald-400 border-emerald-500/20 bg-emerald-500/10";
-                if (info.status.includes("Riskli") || info.status.includes("Güvensiz") || info.status.includes("Yol Tutuş") || info.status.includes("Kullanılamaz")) {
-                    badgeColor = "text-rose-400 border-rose-500/20 bg-rose-500/10";
-                } else if (info.status.includes("Yüksek Sıcaklık") || info.status.includes("Düşük Sıcaklık") || info.status.includes("Esintili") || info.status.includes("Zorlu") || info.status.includes("Termal")) {
-                    badgeColor = "text-amber-400 border-amber-500/20 bg-amber-500/10";
-                }
-
+                
                 const card = document.createElement('div');
                 card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between";
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-zinc-300">
-                                    <i data-lucide="${s.icon}" class="w-4 h-4"></i>
+                                <div class="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-zinc-400">
+                                    <i data-lucide="${s.icon}" class="w-3.5 h-3.5"></i>
                                 </div>
                                 <div>
                                     <h3 class="text-xs font-semibold text-white">${s.name}</h3>
                                     <span class="text-[10px] text-zinc-500">${s.category}</span>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-medium px-2.5 py-1 rounded-md border ${badgeColor}">
+                            <span class="text-[10px] font-mono px-2.5 py-0.5 rounded border border-white/10 bg-zinc-900 text-zinc-300">
                                 ${info.status}
                             </span>
                         </div>
                         
-                        <div class="space-y-1.5 mt-3 text-[11px] font-light border-t border-white/5 pt-3">
-                            <p class="text-zinc-300"><strong class="text-zinc-400 font-normal">İdeal Koşul:</strong> ${info.ideal}</p>
+                        <div class="space-y-1 mt-3 text-[11px] font-light border-t border-white/5 pt-2.5">
+                            <p class="text-zinc-400"><strong class="text-zinc-500 font-normal">İdeal:</strong> ${info.ideal}</p>
                             <p class="text-zinc-400"><strong class="text-zinc-500 font-normal">Problem:</strong> ${info.problem}</p>
-                            <p class="text-emerald-300/90 bg-emerald-500/5 p-2 rounded border border-emerald-500/10 mt-2"><strong class="font-medium text-emerald-400">Öneri:</strong> ${info.suggestion}</p>
+                            <p class="text-zinc-300 mt-1.5"><strong class="text-zinc-400 font-normal">Öneri:</strong> ${info.suggestion}</p>
                         </div>
                     </div>
                 `;
@@ -849,7 +799,7 @@
                 card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-between h-36";
                 card.innerHTML = `
                     <p class="text-[10px] text-zinc-500 font-medium">${t}</p>
-                    <div class="my-1 text-zinc-300"><i data-lucide="${info.icon}" class="w-5 h-5 mx-auto"></i></div>
+                    <div class="my-1 text-zinc-400"><i data-lucide="${info.icon}" class="w-5 h-5 mx-auto"></i></div>
                     <div>
                         <p class="text-[11px] font-medium text-zinc-300 mb-1">${info.text}</p>
                         <p class="text-xs font-semibold text-white">${Math.round(daily.temperature_2m_max[i])}° <span class="text-zinc-500 font-normal">${Math.round(daily.temperature_2m_min[i])}°</span></p>
@@ -866,10 +816,10 @@
             const humidity = c.relative_humidity_2m;
             const soil = c.soil_moisture_0_to_1cm;
 
-            document.getElementById('ai-agriculture').innerText = `Toprak nem seviyesi ${soil} m³/m³. ${soil < 0.15 ? "Kök bölgesinde su stresi riski yüksek. Akşam saatlerinde hassas sulama önerilir." : "Saha hidrolojik dengesi kararlı."}`;
-            document.getElementById('ai-fire').innerText = `Sıcaklık: ${temp}°C, Bağıl Nem: %${humidity}. ${temp > 24 && humidity < 35 ? "Yüksek sıcaklık ve düşük nem nedeniyle yangın hassasiyet indeksi üst seviyede." : "Meteorolojik parametreler yangın riski açısından güvenli eşikte."}`;
-            document.getElementById('ai-maritime').innerText = `Anlık rüzgâr ${wind} km/s. ${wind > 20 ? "Kritik rüzgâr eşiği. Deniz küreği ve yelken faaliyetlerinde korunaklı parkurlar tercih edilmeli." : "Su yüzeyi sürtünmesi düşük. Coastal rowing ve antrenman için elverişli."}`;
-            document.getElementById('ai-sports').innerText = `Sıcaklık ${temp}°C. ${temp >= 12 && temp <= 22 ? "Aerobik kapasite ve dış mekan antrenmanları için optimum termal konfor bölgesi." : "Termal yük faktörüne bağlı olarak elektrolit ve sıvı dengesi gözetilmeli."}`;
+            document.getElementById('ai-agriculture').innerText = `Toprak nem oranı %${(soil * 100).toFixed(0)} (${soil} m³/m³). ${soil < 0.15 ? "Kök bölgesindeki nem düşük seviyede. Sulama yapılması önerilir." : "Nem seviyesi bitki gelişimi için yeterli."}`;
+            document.getElementById('ai-fire').innerText = `Sıcaklık ${temp}°C, Bağıl Nem %${humidity}. ${temp > 24 && humidity < 35 ? "Kuru hava ve yüksek sıcaklık nedeniyle risk seviyesi yüksek." : "Koşullar güvenli aralıkta."}`;
+            document.getElementById('ai-maritime').innerText = `Rüzgâr hızı ${wind} km/s. ${wind > 20 ? "Rüzgâr ve dalga yüksekliği fazla. Küçük tekne faaliyetlerinde dikkatli olunmalı." : "Deniz yüzeyi sakin, seyir için elverişli."}`;
+            document.getElementById('ai-sports').innerText = `Hava sıcaklığı ${temp}°C. ${temp >= 12 && temp <= 22 ? "Dış mekân antrenmanları için ideal sıcaklık aralığı." : "Sıcaklık değerlerine göre antrenman temposu ayarlanmalı."}`;
         }
 
         window.onload = () => {
