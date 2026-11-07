@@ -626,6 +626,37 @@
                     }
                 },
                 {
+                    name: "Tenis",
+                    icon: "activity",
+                    category: "Açık Saha / Kort",
+                    getDetails: () => {
+                        if (isRaining) return {
+                            status: "Kort Kullanılamaz",
+                            ideal: "Kuru zemin, 15°C - 28°C arası hava",
+                            problem: "Yağış ve ıslak zemin kortta kaymaya, düşmeye ve ciddi sakatlıklara yol açabilir.",
+                            suggestion: "Açık kort maçını erteleyin veya kapalı/sentetik kort tercih edin."
+                        };
+                        if (wind > 20) return {
+                            status: "Zorlu Rüzgar",
+                            ideal: "20 km/s altı rüzgar hızı",
+                            problem: `Rüzgar hızı ${wind} km/s. Havalanan topların falsosu ve yönü ciddi şekilde sapar.`,
+                            suggestion: "Taktik olarak kısa toplardan kaçının, rüzgarı hesaba katarak vuruş yapın."
+                        };
+                        if (temp < 10 || temp > 32) return {
+                            status: "Termal Zorlanma",
+                            ideal: "15°C - 28°C sıcaklık aralığı",
+                            problem: `Sıcaklık ${Math.round(temp)}°C. Kas esnekliği veya çabuk yorulma açısından optimal değil.`,
+                            suggestion: "Ekstra ısınma seti uygulayın ve bol sıvı tüketin."
+                        };
+                        return {
+                            status: "İdeal Kort Şartları",
+                            ideal: "15°C - 28°C, rüzgarsız ve kuru",
+                            problem: "Kort performansı için engelleyici bir faktör bulunmuyor.",
+                            suggestion: "Zeminin ve havanın tadını çıkararak maçını planlayabilirsin."
+                        };
+                    }
+                },
+                {
                     name: "Deniz Küreği (Coastal Rowing)",
                     icon: "anchor",
                     category: "Su Sporu",
@@ -725,20 +756,19 @@
             const container = document.getElementById('sports-list-container');
             container.innerHTML = '';
 
-            // Mantıklı sıralama için önceliklendiriyoruz
             sports.sort((a, b) => {
                 const detA = a.getDetails();
                 const detB = b.getDetails();
-                if (detA.status.includes("Kusursuz") || detA.status.includes("Uygun") || detA.status.includes("Alternatif")) return -1;
+                if (detA.status.includes("Kusursuz") || detA.status.includes("Uygun") || detA.status.includes("İdeal") || detA.status.includes("Alternatif")) return -1;
                 return 1;
             });
 
             sports.forEach(s => {
                 const info = s.getDetails();
                 let badgeColor = "text-emerald-400 border-emerald-500/20 bg-emerald-500/10";
-                if (info.status.includes("Riskli") || info.status.includes("Güvensiz") || info.status.includes("Yol Tutuş")) {
+                if (info.status.includes("Riskli") || info.status.includes("Güvensiz") || info.status.includes("Yol Tutuş") || info.status.includes("Kullanılamaz")) {
                     badgeColor = "text-rose-400 border-rose-500/20 bg-rose-500/10";
-                } else if (info.status.includes("Yüksek Sıcaklık") || info.status.includes("Düşük Sıcaklık") || info.status.includes("Esintili")) {
+                } else if (info.status.includes("Yüksek Sıcaklık") || info.status.includes("Düşük Sıcaklık") || info.status.includes("Esintili") || info.status.includes("Zorlu") || info.status.includes("Termal")) {
                     badgeColor = "text-amber-400 border-amber-500/20 bg-amber-500/10";
                 }
 
