@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoPulse — Atmospheric Intelligence</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .glass-panel {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        #map { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 400px;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+    </style>
+</head>
+<body class="bg-[#0b0f17] text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-brand-500/30">
+
+    <!-- Ekstrem Uyarı Şeridi -->
+    <div id="alert-banner" class="hidden bg-amber-500/10 border-b border-amber-500/20 text-amber-200 px-6 py-2.5 text-xs font-medium flex items-center justify-between backdrop-blur-md z-[600]">
+        <div class="flex items-center gap-2">
+            <i data-lucide="triangle-alert" class="w-4 h-4 text-amber-400"></i>
+            <span id="alert-message">Meteorolojik Durum Uyarı Modülü</span>
+        </div>
+        <button onclick="document.getElementById('alert-banner').classList.add('hidden')" class="text-amber-400/60 hover:text-amber-400">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Üst Header Barı -->
+    <header class="border-b border-white/5 px-6 py-3.5 flex flex-wrap justify-between items-center gap-4 bg-[#0b0f17]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-200">
+                <i data-lucide="wind" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <h1 class="font-semibold text-sm tracking-tight text-white">GeoPulse</h1>
+                <p class="text-[11px] text-zinc-400">Atmosferik Analiz ve Karar Destek Platformu</p>
+            </div>
+        </div>
+
+        <!-- Sekme Butonları -->
+        <nav class="flex p-1 rounded-xl glass-panel text-xs flex-wrap gap-1">
+            <button onclick="switchTab('map-tab')" id="btn-map-tab" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 bg-white/10 text-white font-medium transition-all">
+                <i data-lucide="map" class="w-3.5 h-3.5"></i> Canlı Harita
+            </button>
+            <button onclick="switchTab('hourly-tab')" id="btn-hourly-tab" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-all">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i> 48 Saatlik Detay
+            </button>
+            <button onclick="switchTab('forecast-tab')" id="btn-forecast-tab" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-all">
+                <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 7 Günlük Tahmin
+            </button>
+            <button onclick="switchTab('sports-tab')" id="btn-sports-tab" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-all">
+                <i data-lucide="trophy" class="w-3.5 h-3.5"></i> Spor & Planlama
+            </button>
+            <button onclick="switchTab('ai-tab')" id="btn-ai-tab" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-all">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Sektörel Analiz
+            </button>
+        </nav>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="flex-1 p-6 flex flex-col max-w-7xl w-full mx-auto">
+
+        <!-- 1. SEKME: CANLI HARİTA & TELEMETRİ -->
+        <div id="map-tab" class="tab-content h-full flex-1 flex flex-col lg:flex-row gap-5">
+            <div class="flex-1 glass-panel rounded-2xl overflow-hidden relative min-h-[450px] flex flex-col">
+                <div class="absolute top-4 left-4 right-4 z-[500] flex gap-2">
+                    <div class="flex-1 flex glass-panel rounded-xl overflow-hidden shadow-2xl border border-white/10">
+                        <input id="search-input" type="text" placeholder="Konum ara..." class="bg-transparent px-4 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none flex-1">
+                        <button onclick="searchLocation()" class="px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition border-l border-white/5">
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <button onclick="locateUserGPS()" class="glass-button text-zinc-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition shadow-2xl" title="GPS">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button onclick="toggleMapLayer()" class="glass-button text-zinc-300 hover:text-white px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition shadow-2xl">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i> <span id="layer-text" class="hidden sm:inline">Uydu</span>
+                    </button>
+                </div>
+                <div id="map"></div>
+            </div>
+            
+            <div class="w-full lg:w-80 flex flex-col gap-4">
+                <div class="glass-panel rounded-2xl p-5 relative">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="location-name-1" class="text-sm font-semibold text-white">Konum Yükleniyor...</h2>
+                            <p id="location-coords-1" class="text-[11px] text-zinc-500 font-mono mt-0.5">--° N, --° E</p>
+                        </div>
+                        <div id="weather-icon-container" class="text-zinc-300">
+                            <i data-lucide="sun" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-baseline justify-between">
+                        <div>
+                            <span id="live-temp" class="text-5xl font-light tracking-tight text-white">--</span>
+                            <span class="text-xl text-zinc-500 font-light">°C</span>
+                        </div>
+                        <span id="weather-text" class="text-xs font-medium text-zinc-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">Veri Bekleniyor</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-panel rounded-xl p-3.5">
+                        <span class="text-[11px] text-zinc-500 block mb-1">Rüzgâr Hızı</span>
+                        <span id="live-wind" class="text-base font-medium text-zinc-200">-- km/s</span>
+                    </div>
+                    <div class="glass-panel rounded-xl p-3.5">
+                        <span class="text-[11px] text-zinc-500 block mb-1">Bağıl Nem</span>
+                        <span id="live-humidity" class="text-base font-medium text-zinc-200">-- %</span>
+                    </div>
+                    <div class="glass-panel rounded-xl p-3.5">
+                        <span class="text-[11px] text-zinc-500 block mb-1">Toprak Nemi</span>
+                        <span id="live-soil" class="text-base font-medium text-zinc-200">-- m³/m³</span>
+                    </div>
+                    <div class="glass-panel rounded-xl p-3.5">
+                        <span class="text-[11px] text-zinc-500 block mb-1">Yağış Olasılığı</span>
+                        <span id="live-pop" class="text-base font-medium text-zinc-200">% --</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-4 flex flex-col gap-2">
+                    <span class="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">Veri Çıktısı</span>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button onclick="exportCSV()" class="glass-button text-xs text-zinc-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-zinc-400"></i> CSV
+                        </button>
+                        <button onclick="exportGeoJSON()" class="glass-button text-xs text-zinc-300 py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="file-json" class="w-3.5 h-3.5 text-zinc-400"></i> GeoJSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SEKME: 48 SAATLİK TAHMİN -->
+        <div id="hourly-tab" class="tab-content hidden h-full flex-1 flex flex-col glass-panel rounded-2xl p-6 gap-6">
+            <div class="flex justify-between items-center pb-4 border-b border-white/5">
+                <div>
+                    <h2 class="text-sm font-semibold text-white">48 Saatlik Atmosfer Projeksiyonu</h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Mevcut saatten itibaren önümüzdeki 48 saatin sıcaklık ve yağış eğrisi.</p>
+                </div>
+                <div class="text-right">
+                    <p id="location-name-2" class="text-xs font-semibold text-zinc-300">--</p>
+                    <p id="location-coords-2" class="text-[10px] text-zinc-500 font-mono">--° N, --° E</p>
+                </div>
+            </div>
+
+            <div id="hourly-cards-container" class="flex gap-3 overflow-x-auto pb-3 no-scrollbar border-b border-white/5"></div>
+
+            <div class="flex-1 w-full min-h-[260px]">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 3. SEKME: 7 GÜNLÜK TAHMİN -->
+        <div id="forecast-tab" class="tab-content hidden h-full flex-1 flex flex-col glass-panel rounded-2xl p-6">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
+                <div>
+                    <h2 class="text-sm font-semibold text-white">7 Günlük Meteorolojik Görünüm</h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Haftalık termal salınım ve toplam yağış beklentisi.</p>
+                </div>
+                <div class="text-right">
+                    <p id="location-name-3" class="text-xs font-semibold text-zinc-300">--</p>
+                    <p id="location-coords-3" class="text-[10px] text-zinc-500 font-mono">--° N, --° E</p>
+                </div>
+            </div>
+            <div id="forecast-container" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 my-auto"></div>
+        </div>
+
+        <!-- 4. SEKME: DİNAMİK SAAT SEÇİCİLİ SPOR PLANLAYICI -->
+        <div id="sports-tab" class="tab-content hidden h-full flex-1 flex flex-col glass-panel rounded-2xl p-6 gap-6">
+            <div class="flex flex-wrap justify-between items-center pb-4 border-b border-white/5 gap-4">
+                <div>
+                    <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-4 h-4 text-brand-500"></i> Gelecek 48 Saatlik Spor & Etkinlik Planlayıcı
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Mevcut saatten itibaren dilediğin saati seç, o anki hava koşullarına göre spor skorunu gör.</p>
+                </div>
+                <div class="text-right">
+                    <p id="location-name-5" class="text-xs font-semibold text-zinc-300">--</p>
+                    <p id="location-coords-5" class="text-[10px] text-zinc-500 font-mono">--° N, --° E</p>
+                </div>
+            </div>
+
+            <!-- SAAT SEÇİCİ SLIDER -->
+            <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="w-full md:w-2/3 flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-zinc-400 font-medium">Hedef Zaman Seçin:</span>
+                        <span id="selected-time-label" class="text-brand-500 font-bold font-mono">Şimdi (Canlı)</span>
+                    </div>
+                    <input id="sports-time-slider" type="range" min="0" max="47" value="0" oninput="onSportsSliderChange(this.value)" class="w-full accent-brand-500 bg-zinc-800 rounded-lg cursor-pointer h-2">
+                    <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
+                        <span>Şimdi</span>
+                        <span>+24 Saat Sonra</span>
+                        <span>+48 Saat Sonra</span>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/3 bg-white/5 rounded-lg p-3 border border-white/5 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-zinc-400 block">Seçilen Saatte Hava</span>
+                        <span id="target-temp-text" class="text-sm font-semibold text-white">--°C</span>
+                        <span id="target-condition-text" class="text-[11px] text-zinc-400 block">--</span>
+                    </div>
+                    <div class="text-right text-[11px] text-zinc-400 font-mono">
+                        <div>Rüzgâr: <span id="target-wind-text" class="text-zinc-200">-- km/s</span></div>
+                        <div>Yağış İht.: <span id="target-pop-text" class="text-zinc-200">% --</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sports-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-1"></div>
+        </div>
+
+        <!-- 5. SEKME: SEKTÖREL ANALİZ -->
+        <div id="ai-tab" class="tab-content hidden h-full flex-1 flex flex-col glass-panel rounded-2xl p-6 gap-5">
+            <div class="flex justify-between items-center pb-4 border-b border-white/5">
+                <div>
+                    <h2 class="text-sm font-semibold text-white">Sektörel Karar Destek Raporu</h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Anlık ve tahmini telemetri parametreleriyle oluşturulan teknik etki matrisi.</p>
+                </div>
+                <div class="text-right">
+                    <p id="location-name-4" class="text-xs font-semibold text-zinc-300">--</p>
+                    <p id="location-coords-4" class="text-[10px] text-zinc-500 font-mono">--° N, --° E</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
+                            <i data-lucide="sprout" class="w-4 h-4 text-emerald-400"></i> Hassas Tarım & Sulama Optimizasyonu
+                        </div>
+                        <p id="ai-agriculture" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
+                    </div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
+                            <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i> Orman Yangını & Risk Endeksi
+                        </div>
+                        <p id="ai-fire" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
+                    </div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
+                            <i data-lucide="waves" class="w-4 h-4 text-cyan-400"></i> Denizcilik & Kürek (Rowing) Güvenliği
+                        </div>
+                        <p id="ai-maritime" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
+                    </div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2 text-zinc-200 font-medium text-xs">
+                            <i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i> Dış Mekan Antrenman & Fizyoloji
+                        </div>
+                        <p id="ai-sports" class="text-xs text-zinc-400 leading-relaxed font-light">Analiz yapılıyor...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        let map, marker, selectedLat = 38.31, selectedLng = 26.65;
+        let hourlyChart = null;
+        let currentWeatherData = null;
+        let globalHourlyStartIndex = 0;
+        let globalHourlyData = null;
+        let currentAddressName = "Urla, İzmir";
+        let streetLayer, satelliteLayer, isSatellite = false;
+
+        function parseWMO(code) {
+            if (code === 0) return { text: "Güneşli", icon: "sun" };
+            if (code >= 1 && code <= 3) return { text: "Parçalı Bulutlu", icon: "cloud-sun" };
+            if (code === 45 || code === 48) return { text: "Sisli", icon: "cloud-fog" };
+            if (code >= 51 && code <= 67) return { text: "Yağmurlu", icon: "cloud-rain" };
+            if (code >= 71 && code <= 77) return { text: "Kar Yağışlı", icon: "snowflake" };
+            if (code >= 80 && code <= 82) return { text: "Sağanak", icon: "cloud-lightning" };
+            if (code >= 95) return { text: "Fırtına", icon: "zap" };
+            return { text: "Bulutlu", icon: "cloud" };
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white/10', 'text-white');
+                btn.classList.add('text-zinc-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-white/10', 'text-white');
+            activeBtn.classList.remove('text-zinc-400');
+
+            if (tabId === 'map-tab' && map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        function initMap() {
+            streetLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { 
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 18,
+                updateWhenZooming: false,
+                updateWhenIdle: true
+            });
+            
+            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { 
+                attribution: 'Tiles &copy; Esri' 
+            });
+
+            map = L.map('map', { 
+                center: [selectedLat, selectedLng], 
+                zoom: 11, 
+                layers: [streetLayer],
+                zoomSnap: 0.5,
+                easeLinearity: 0.25
+            });
+
+            marker = L.marker([selectedLat, selectedLng]).addTo(map);
+
+            map.on('click', function(e) {
+                selectedLat = e.latlng.lat;
+                selectedLng = e.latlng.lng;
+                marker.setLatLng(e.latlng);
+                currentAddressName = "Seçilen Koordinat";
+                updateAllLocationLabels();
+                fetchLiveData();
+            });
+
+            locateUserGPS();
+
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 200);
+        }
+
+        function locateUserGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        selectedLat = position.coords.latitude;
+                        selectedLng = position.coords.longitude;
+                        currentAddressName = "Mevcut Konum";
+                        map.setView([selectedLat, selectedLng], 12);
+                        marker.setLatLng([selectedLat, selectedLng]);
+                        updateAllLocationLabels();
+                        fetchLiveData();
+                    },
+                    () => {
+                        updateAllLocationLabels();
+                        fetchLiveData();
+                    }
+                );
+            } else {
+                updateAllLocationLabels();
+                fetchLiveData();
+            }
+        }
+
+        function toggleMapLayer() {
+            if (isSatellite) {
+                map.removeLayer(satelliteLayer);
+                map.addLayer(streetLayer);
+                document.getElementById('layer-text').innerText = "Uydu";
+            } else {
+                map.removeLayer(streetLayer);
+                map.addLayer(satelliteLayer);
+                document.getElementById('layer-text').innerText = "Harita";
+            }
+            isSatellite = !isSatellite;
+        }
+
+        async function searchLocation() {
+            const query = document.getElementById('search-input').value;
+            if (!query) return;
+
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+
+                if (data && data.length > 0) {
+                    selectedLat = parseFloat(data[0].lat);
+                    selectedLng = parseFloat(data[0].lon);
+                    currentAddressName = data[0].display_name.split(',')[0];
+                    
+                    map.setView([selectedLat, selectedLng], 12);
+                    marker.setLatLng([selectedLat, selectedLng]);
+                    
+                    updateAllLocationLabels();
+                    fetchLiveData();
+                }
+            } catch (err) {
+                console.error("Arama hatası:", err);
+            }
+        }
+
+        document.getElementById('search-input')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchLocation();
+        });
+
+        function updateAllLocationLabels() {
+            const coordText = `${selectedLat.toFixed(2)}° N, ${selectedLng.toFixed(2)}° E`;
+            [1, 2, 3, 4, 5].forEach(i => {
+                const elN = document.getElementById(`location-name-${i}`);
+                const elC = document.getElementById(`location-coords-${i}`);
+                if(elN) elN.innerText = currentAddressName;
+                if(elC) elC.innerText = coordText;
+            });
+        }
+
+        async function fetchLiveData() {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${selectedLat}&longitude=${selectedLng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,soil_moisture_0_to_1cm,weathercode&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation_probability,precipitation,weathercode&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode&timezone=auto`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                currentWeatherData = data.current;
+                globalHourlyData = data.hourly;
+                
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                
+                const localHourPrefix = `${year}-${month}-${day}T${hours}`;
+                
+                globalHourlyStartIndex = globalHourlyData.time.findIndex(t => t.startsWith(localHourPrefix));
+                if (globalHourlyStartIndex === -1) globalHourlyStartIndex = 0;
+
+                const weatherInfo = parseWMO(currentWeatherData.weathercode);
+                document.getElementById('weather-text').innerText = weatherInfo.text;
+                document.getElementById('weather-icon-container').innerHTML = `<i data-lucide="${weatherInfo.icon}" class="w-6 h-6"></i>`;
+
+                document.getElementById('live-temp').innerText = `${Math.round(currentWeatherData.temperature_2m)}`;
+                document.getElementById('live-wind').innerText = `${currentWeatherData.wind_speed_10m} km/s`;
+                document.getElementById('live-humidity').innerText = `${currentWeatherData.relative_humidity_2m} %`;
+                document.getElementById('live-soil').innerText = `${currentWeatherData.soil_moisture_0_to_1cm} m³/m³`;
+                
+                const currentPop = globalHourlyData.precipitation_probability[globalHourlyStartIndex] || 0;
+                document.getElementById('live-pop').innerText = `% ${currentPop}`;
+
+                checkExtremeWeather(currentWeatherData);
+                renderHourlyData(globalHourlyData, globalHourlyStartIndex);
+                renderForecast(data.daily);
+                
+                document.getElementById('sports-time-slider').value = 0;
+                onSportsSliderChange(0);
+                
+                generateAdvancedAIReport(currentWeatherData);
+                lucide.createIcons();
+            } catch (err) {
+                console.error("API hatası:", err);
+            }
+        }
+
+        function renderHourlyData(hourly, startIndex) {
+            const container = document.getElementById('hourly-cards-container');
+            container.innerHTML = '';
+
+            const slicedTimes = hourly.time.slice(startIndex, startIndex + 48);
+            const slicedTemps = hourly.temperature_2m.slice(startIndex, startIndex + 48);
+            const slicedPrecips = hourly.precipitation.slice(startIndex, startIndex + 48);
+            const slicedCodes = hourly.weathercode.slice(startIndex, startIndex + 48);
+
+            const labels = slicedTimes.map((t, idx) => {
+                const date = new Date(t);
+                return idx === 0 ? "Şimdi" : `${date.getHours().toString().padStart(2, '0')}:00 (${date.getDate()}/${date.getMonth()+1})`;
+            });
+
+            labels.forEach((h, i) => {
+                const info = parseWMO(slicedCodes[i]);
+                const card = document.createElement('div');
+                card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-3 min-w-[95px] text-center flex flex-col items-center justify-between";
+                card.innerHTML = `
+                    <span class="text-[10px] text-zinc-500 font-mono">${h}</span>
+                    <div class="my-2 text-zinc-300"><i data-lucide="${info.icon}" class="w-4 h-4"></i></div>
+                    <span class="text-xs font-medium text-white">${Math.round(slicedTemps[i])}°C</span>
+                    <span class="text-[9px] text-zinc-500 mt-0.5">${slicedPrecips[i]} mm</span>
+                `;
+                container.appendChild(card);
+            });
+
+            if (hourlyChart) hourlyChart.destroy();
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            hourlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Sıcaklık (°C)', data: slicedTemps, borderColor: 'rgba(255, 255, 255, 0.8)', borderWidth: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.02)', fill: true, tension: 0.4, pointRadius: 0 },
+                        { label: 'Yağış (mm)', data: slicedPrecips, borderColor: 'rgba(56, 189, 248, 0.8)', borderWidth: 1.5, backgroundColor: 'rgba(56, 189, 248, 0.05)', fill: true, tension: 0.2, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.03)' }, ticks: { color: 'rgba(255, 255, 255, 0.3)', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function onSportsSliderChange(sliderValue) {
+            if (!globalHourlyData) return;
+
+            const offset = parseInt(sliderValue);
+            const actualIndex = globalHourlyStartIndex + offset;
+            
+            if (actualIndex >= globalHourlyData.time.length) return;
+
+            const targetTimeStr = globalHourlyData.time[actualIndex];
+            const date = new Date(targetTimeStr);
+            
+            const timeLabel = offset === 0 ? "Şimdi (Canlı)" : `${date.getDate()} ${date.toLocaleString('tr-TR', { month: 'short' })} ${date.getHours().toString().padStart(2, '0')}:00`;
+            document.getElementById('selected-time-label').innerText = timeLabel;
+
+            const temp = globalHourlyData.temperature_2m[actualIndex];
+            const wind = globalHourlyData.wind_speed_10m[actualIndex];
+            const pop = globalHourlyData.precipitation_probability[actualIndex];
+            const code = globalHourlyData.weathercode[actualIndex];
+            const humidity = globalHourlyData.relative_humidity_2m[actualIndex];
+            const condition = parseWMO(code).text;
+
+            document.getElementById('target-temp-text').innerText = `${Math.round(temp)}°C`;
+            document.getElementById('target-condition-text').innerText = condition;
+            document.getElementById('target-wind-text').innerText = `${wind} km/s`;
+            document.getElementById('target-pop-text').innerText = `%${pop}`;
+
+            renderSportsRecommendations(temp, wind, pop, code, humidity);
+            lucide.createIcons();
+        }
+
+        function renderSportsRecommendations(temp, wind, precipProb, code, humidity) {
+            const isRaining = code >= 51 || precipProb > 50;
+
+            const sports = [
+                {
+                    name: "Açık Hava Koşusu & HIIT",
+                    icon: "footprints",
+                    category: "Dış Mekan",
+                    getDetails: () => {
+                        if (isRaining) return {
+                            status: "Riskli / Kaygan Zemin",
+                            ideal: "Yağışsız zemin, 10°C - 20°C arası sıcaklık",
+                            problem: "Yağış olasılığı ve ıslak asfalt tutuş kaybına, eklem ve kaslara binen stresi artırmaya yol açabilir.",
+                            suggestion: "Koşuyu erteleyin veya kapalı alanda koşu bandı tercih edin. Dışarıda koşacaksanız tabanı güçlü ayakkabılar giyin."
+                        };
+                        if (temp >= 10 && temp <= 20 && wind < 25) return {
+                            status: "Kusursuz Koşul",
+                            ideal: "10°C - 20°C arası sıcaklık, düşük rüzgâr",
+                            problem: "Hiçbir termal veya meteorolojik risk bulunmuyor.",
+                            suggestion: "Kardiyovasküler kapasiteyi zorlamak için ideal zaman. Standart dinamik ısınma ile hemen başlayabilirsiniz."
+                        };
+                        if (temp > 25) return {
+                            status: "Yüksek Sıcaklık Stresi",
+                            ideal: "10°C - 20°C arası serin hava",
+                            problem: `Sıcaklık ${Math.round(temp)}°C seviyesinde. Erken yorulma, yüksek nabız ve dehidrasyon riski yüksek.`,
+                            suggestion: "Antrenmanı güneşin dik olmadığı sabah erken veya akşam saatlerine kaydırın, elektrolit takviyesini unutmayın."
+                        };
+                        return {
+                            status: "Düşük Sıcaklık / Soğuk",
+                            ideal: "10°C ve üzeri sıcaklık",
+                            problem: `Sıcaklık ${Math.round(temp)}°C. Yeterli ısınma yapılmazsa kas lifi zorlanması ve kramp riski yaşanabilir.`,
+                            suggestion: "Statik esneme yerine en az 10-15 dakika tempolu dinamik ısınma (açma-germe hareketleri) yapın ve rüzgarlık giyin."
+                        };
+                    }
+                },
+                {
+                    name: "Deniz Küreği (Coastal Rowing)",
+                    icon: "anchor",
+                    category: "Su Sporu",
+                    getDetails: () => {
+                        if (wind > 20 || isRaining) return {
+                            status: "Güvensiz Su Koşulları",
+                            ideal: "Rüzgâr 10 km/s altı, durgun su",
+                            problem: `Rüzgâr şiddetli (${wind} km/s) ve dalga boyu yüksek. Tekne dengesini korumak zorlaşır ve güvenlik riski doğar.`,
+                            suggestion: "Açık su faaliyetini iptal edin. Salonda ergometre (kürek simülatörü) ile teknik ve watt antrenmanına odaklanın."
+                        };
+                        if (wind <= 10 && !isRaining) return {
+                            status: "Optimum Su Yüzeyi",
+                            ideal: "10 km/s altı rüzgâr",
+                            problem: "Hiçinci bir dalga veya akıntı baskısı yok.",
+                            suggestion: "Su pürüzsüz; yakar top, çekiş uzunluğu ve kürek tutuş tekniklerini geliştirmek için kusursuz bir fırsat."
+                        };
+                        return {
+                            status: "Esintili / Sınırda",
+                            ideal: "Sakin körfez suları",
+                            problem: `Rüzgâr ${wind} km/s esiyor. Dalgalanma teknede su sıçratabilir ve rotada sapma yapabilir.`,
+                            suggestion: "Açık deniz yerine korunaklı kıyı parkurlarını seçin, kürek sırtı rüzgâra karşı dikkatli olun."
+                        };
+                    }
+                },
+                {
+                    name: "Bisiklet / Yol Sürüşü",
+                    icon: "bike",
+                    category: "Dış Mekan",
+                    getDetails: () => {
+                        if (wind > 25 || isRaining) return {
+                            status: "Yol Tutuş Riski",
+                            ideal: "Kuru zemin, hafif rüzgâr",
+                            problem: isRaining ? "Islak asfalt fren mesafesini uzatır ve virajlarda kayma riski doğurur." : `Şiddetli yan rüzgâr (${wind} km/s) gidon hâkimiyetini sarsar.`,
+                            suggestion: "Sürüşü erteleyin. Dışarı çıkmak zorundaysanız lastik basınçlarını bir miktar düşürerek zemin tutuşunu artırın."
+                        };
+                        return {
+                            status: "Sürüş İçin Uygun",
+                            ideal: "12°C - 24°C arası sıcaklık",
+                            problem: "Normal trafik ve rüzgâr dinamikleri dışında majör bir risk yok.",
+                            suggestion: "Rüzgâr kesen rüzgârlık giyin, uzun sürüşler için rüzgâr tüneli pozisyonuna ve sıvı tüketimine dikkat edin."
+                        };
+                    }
+                },
+                {
+                    name: "Kalistenik & Park Antrenmanı",
+                    icon: "dumbell",
+                    category: "Dış Mekan",
+                    getDetails: () => {
+                        if (isRaining) return {
+                            status: "Ekipman Kayganlığı",
+                            ideal: "Kuru demir bar ve barlar",
+                            problem: "Yağış nedeniyle parktaki barfiks ve paralel bar demirleri ıslak olacak; el kavrama (grip) gücü düşer ve düşme riski artar.",
+                            suggestion: "Eğer imkan varsa kapalı bara geçin veya magnezyum tozu/özel eldiven kullanın; antrenmanı core ve yer hareketlerine kaydırın."
+                        };
+                        return {
+                            status: "Park Antrenmanı İçin Uygun",
+                            ideal: "15°C - 25°C kuru hava",
+                            problem: "Hava serinse eklem sıvıları henüz tam akışkanlaşmamış olabilir.",
+                            suggestion: "Antrenmana başlamadan önce omuz ve bilek eklemlerini dairesel hareketlerle iyice ısıtın, ani patlayıcı hareketlerden kaçının."
+                        };
+                    }
+                },
+                {
+                    name: "Açık Deniz Yüzme",
+                    icon: "waves",
+                    category: "Su Sporu",
+                    getDetails: () => {
+                        if (temp < 18 || wind > 25 || isRaining) return {
+                            status: "Hipotermi / Akıntı Riski",
+                            ideal: "Su sıcaklığı >22°C, sakin deniz",
+                            problem: `Su sıcaklığı düşük (${temp}°C) veya rüzgâr fazla (${wind} km/s). Vücut ısısının hızla düşmesine (hipotermi) yol açabilir.`,
+                            suggestion: "Kesinlikle neopren yüzücü kıyafeti (wetsuit) olmadan girmeyin veya antrenmanı havuzda sonlandırın."
+                        };
+                        return {
+                            status: "Yüzülebilir Şartlar",
+                            ideal: "Dengeli su ve hava sıcaklığı",
+                            problem: "Olağandışı bir akıntı uyarısı bulunmuyor.",
+                            suggestion: "Suya yavaş yavaş girerek termal şokü atlatın, kıyıya paralel yüzme rotasını tercih edin."
+                        };
+                    }
+                },
+                {
+                    name: "Kapalı Salon / Ergometre (Erg)",
+                    icon: "building",
+                    category: "İç Mekan",
+                    getDetails: () => {
+                        return {
+                            status: "Güvenli Alternatif",
+                            ideal: "İklimlendirilmiş salon ortamı",
+                            problem: "Dış ortam şartlarından tamamen bağımsızdır.",
+                            suggestion: "Dışarıdaki olumsuz hava koşullarından (fırtına, yağmur, aşırı sıcak) etkilenmemek için bu saati ergometre veya salon antrenmanına ayırabilirsiniz."
+                        };
+                    }
+                }
+            ];
+
+            const container = document.getElementById('sports-list-container');
+            container.innerHTML = '';
+
+            // Mantıklı sıralama için önceliklendiriyoruz
+            sports.sort((a, b) => {
+                const detA = a.getDetails();
+                const detB = b.getDetails();
+                if (detA.status.includes("Kusursuz") || detA.status.includes("Uygun") || detA.status.includes("Alternatif")) return -1;
+                return 1;
+            });
+
+            sports.forEach(s => {
+                const info = s.getDetails();
+                let badgeColor = "text-emerald-400 border-emerald-500/20 bg-emerald-500/10";
+                if (info.status.includes("Riskli") || info.status.includes("Güvensiz") || info.status.includes("Yol Tutuş")) {
+                    badgeColor = "text-rose-400 border-rose-500/20 bg-rose-500/10";
+                } else if (info.status.includes("Yüksek Sıcaklık") || info.status.includes("Düşük Sıcaklık") || info.status.includes("Esintili")) {
+                    badgeColor = "text-amber-400 border-amber-500/20 bg-amber-500/10";
+                }
+
+                const card = document.createElement('div');
+                card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-4.5 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-zinc-300">
+                                    <i data-lucide="${s.icon}" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-semibold text-white">${s.name}</h3>
+                                    <span class="text-[10px] text-zinc-500">${s.category}</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-medium px-2.5 py-1 rounded-md border ${badgeColor}">
+                                ${info.status}
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-1.5 mt-3 text-[11px] font-light border-t border-white/5 pt-3">
+                            <p class="text-zinc-300"><strong class="text-zinc-400 font-normal">İdeal Koşul:</strong> ${info.ideal}</p>
+                            <p class="text-zinc-400"><strong class="text-zinc-500 font-normal">Problem:</strong> ${info.problem}</p>
+                            <p class="text-emerald-300/90 bg-emerald-500/5 p-2 rounded border border-emerald-500/10 mt-2"><strong class="font-medium text-emerald-400">Öneri:</strong> ${info.suggestion}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkExtremeWeather(c) {
+            const banner = document.getElementById('alert-banner');
+            const msg = document.getElementById('alert-message');
+            
+            if (c.wind_speed_10m > 30) {
+                msg.innerText = `Meteorolojik Uyarı: Yüksek Rüzgâr Hızı (${c.wind_speed_10m} km/s)`;
+                banner.classList.remove('hidden');
+            } else if (c.temperature_2m > 35) {
+                msg.innerText = `Meteorolojik Uyarı: Yüksek Isı Stresi (${c.temperature_2m}°C)`;
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        function exportCSV() {
+            if (!currentWeatherData) return;
+            const csvContent = "data:text/csv;charset=utf-8," + "Enlem,Boylam,Sicaklik_C,Ruzgar_kmh,Nem_Yuzde\n" + `${selectedLat},${selectedLng},${currentWeatherData.temperature_2m},${currentWeatherData.wind_speed_10m},${currentWeatherData.relative_humidity_2m}`;
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `GeoPulse_Export.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportGeoJSON() {
+            if (!currentWeatherData) return;
+            const geojson = { type: "Feature", geometry: { type: "Point", coordinates: [selectedLng, selectedLat] }, properties: { name: currentAddressName, temp: currentWeatherData.temperature_2m } };
+            const link = document.createElement("a");
+            link.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojson, null, 2)));
+            link.setAttribute("download", `GeoPulse_Point.geojson`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function renderForecast(daily) {
+            const container = document.getElementById('forecast-container');
+            container.innerHTML = '';
+
+            daily.time.forEach((t, i) => {
+                const info = parseWMO(daily.weathercode[i]);
+                const card = document.createElement('div');
+                card.className = "bg-white/[0.02] border border-white/5 rounded-xl p-3 text-center flex flex-col justify-between h-36";
+                card.innerHTML = `
+                    <p class="text-[10px] text-zinc-500 font-medium">${t}</p>
+                    <div class="my-1 text-zinc-300"><i data-lucide="${info.icon}" class="w-5 h-5 mx-auto"></i></div>
+                    <div>
+                        <p class="text-[11px] font-medium text-zinc-300 mb-1">${info.text}</p>
+                        <p class="text-xs font-semibold text-white">${Math.round(daily.temperature_2m_max[i])}° <span class="text-zinc-500 font-normal">${Math.round(daily.temperature_2m_min[i])}°</span></p>
+                        <p class="text-[9px] text-zinc-500 mt-1">${daily.precipitation_sum[i]} mm</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function generateAdvancedAIReport(c) {
+            const temp = c.temperature_2m;
+            const wind = c.wind_speed_10m;
+            const humidity = c.relative_humidity_2m;
+            const soil = c.soil_moisture_0_to_1cm;
+
+            document.getElementById('ai-agriculture').innerText = `Toprak nem seviyesi ${soil} m³/m³. ${soil < 0.15 ? "Kök bölgesinde su stresi riski yüksek. Akşam saatlerinde hassas sulama önerilir." : "Saha hidrolojik dengesi kararlı."}`;
+            document.getElementById('ai-fire').innerText = `Sıcaklık: ${temp}°C, Bağıl Nem: %${humidity}. ${temp > 24 && humidity < 35 ? "Yüksek sıcaklık ve düşük nem nedeniyle yangın hassasiyet indeksi üst seviyede." : "Meteorolojik parametreler yangın riski açısından güvenli eşikte."}`;
+            document.getElementById('ai-maritime').innerText = `Anlık rüzgâr ${wind} km/s. ${wind > 20 ? "Kritik rüzgâr eşiği. Deniz küreği ve yelken faaliyetlerinde korunaklı parkurlar tercih edilmeli." : "Su yüzeyi sürtünmesi düşük. Coastal rowing ve antrenman için elverişli."}`;
+            document.getElementById('ai-sports').innerText = `Sıcaklık ${temp}°C. ${temp >= 12 && temp <= 22 ? "Aerobik kapasite ve dış mekan antrenmanları için optimum termal konfor bölgesi." : "Termal yük faktörüne bağlı olarak elektrolit ve sıvı dengesi gözetilmeli."}`;
+        }
+
+        window.onload = () => {
+            initMap();
+        };
+    </script>
+</body>
+</html>
